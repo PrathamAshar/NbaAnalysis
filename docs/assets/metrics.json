@@ -1,0 +1,183 @@
+{
+  "games_count": 65698,
+  "players_unique": 1878,
+  "box_rows": 9930,
+  "season_start": 1946,
+  "season_end": 2022,
+  "home_mean": 104.61913604675941,
+  "away_mean": 100.99156747541782,
+  "home_win_rate": 0.6187707388352766,
+  "home_t_stat": 45.06522118080557,
+  "home_p_value": 0.0,
+  "scoring_r": -0.12198721559938765,
+  "scoring_p": 0.4358211665577782,
+  "chi2": 1057.3111956029252,
+  "chi2_p": 6.269312332914335e-232,
+  "era_home_win": {
+    "1947\u201369": 0.6827963835476888,
+    "1970\u201389": 0.6454472660718371,
+    "1990\u201309": 0.6061677860350515,
+    "2010\u201322": 0.5748248922413793
+  },
+  "top_scorers": [
+    {
+      "player_name": "James Harden",
+      "season_year": 2018,
+      "pts_pg": 35.25581395348837,
+      "reb_pg": 6.790697674418604,
+      "tov_pg": 5.0
+    },
+    {
+      "player_name": "Kobe Bryant",
+      "season_year": 2005,
+      "pts_pg": 34.97142857142857,
+      "reb_pg": 5.671428571428572,
+      "tov_pg": 3.057142857142857
+    },
+    {
+      "player_name": "James Harden",
+      "season_year": 2019,
+      "pts_pg": 33.729729729729726,
+      "reb_pg": 6.405405405405405,
+      "tov_pg": 4.256756756756757
+    },
+    {
+      "player_name": "Allen Iverson",
+      "season_year": 2005,
+      "pts_pg": 32.58064516129032,
+      "reb_pg": 3.193548387096774,
+      "tov_pg": 3.564516129032258
+    },
+    {
+      "player_name": "Joel Embiid",
+      "season_year": 2022,
+      "pts_pg": 32.563380281690144,
+      "reb_pg": 9.971830985915492,
+      "tov_pg": 3.3661971830985915
+    },
+    {
+      "player_name": "LeBron James",
+      "season_year": 2005,
+      "pts_pg": 32.46478873239437,
+      "reb_pg": 7.042253521126761,
+      "tov_pg": 3.23943661971831
+    },
+    {
+      "player_name": "Allen Iverson",
+      "season_year": 2000,
+      "pts_pg": 32.27058823529412,
+      "reb_pg": 4.141176470588236,
+      "tov_pg": 3.1411764705882352
+    },
+    {
+      "player_name": "Tracy McGrady",
+      "season_year": 2002,
+      "pts_pg": 32.13513513513514,
+      "reb_pg": 6.594594594594595,
+      "tov_pg": 2.7027027027027026
+    },
+    {
+      "player_name": "Damian Lillard",
+      "season_year": 2022,
+      "pts_pg": 32.06666666666667,
+      "reb_pg": 4.733333333333333,
+      "tov_pg": 3.183333333333333
+    },
+    {
+      "player_name": "Stephen Curry",
+      "season_year": 2020,
+      "pts_pg": 31.93548387096774,
+      "reb_pg": 5.387096774193548,
+      "tov_pg": 3.2903225806451615
+    }
+  ],
+  "classification_dataset_games": 51589,
+  "classification_train_games": 43742,
+  "classification_test_games": 7847,
+  "classification_cv_auc_logreg": 0.6741895449160131,
+  "classification_cv_auc_rf": 0.6746461983625829,
+  "classification_test_auc_logreg": 0.6371287130674195,
+  "classification_test_auc_rf": 0.6370087013297102,
+  "classification_test_acc_logreg": 0.6088951191538168,
+  "classification_test_acc_rf": 0.6069835605964062,
+  "classification_baseline_acc": 0.5636548999617689,
+  "clf_feature_importances": {
+    "home_team_recent_wins": 0.4036039534342345,
+    "away_team_recent_wins": 0.3207510430911004,
+    "home_team_recent_pts": 0.11817682837482521,
+    "away_team_recent_pts": 0.0900117499570968,
+    "season_year": 0.06152345002784646,
+    "is_playoff": 0.005932975114896583
+  },
+  "clf_logreg_coefs": {
+    "away_team_recent_wins": -0.4252095925718243,
+    "season_year": -0.07983948307620835,
+    "away_team_recent_pts": -0.049488452534285084,
+    "is_playoff": 0.026154946132730363,
+    "home_team_recent_pts": 0.08366279371400377,
+    "home_team_recent_wins": 0.4613368208473516
+  },
+  "best_k": 2,
+  "silhouette_scores": {
+    "2": 0.4869252450447767,
+    "3": 0.36249834381999757,
+    "4": 0.3612744081655828,
+    "5": 0.362244722072989,
+    "6": 0.32937235919099994,
+    "7": 0.30386845131042506,
+    "8": 0.2870358191030346
+  },
+  "pca_total_variance": 0.9406083916083675,
+  "archetype_sizes": {
+    "Bench / low usage": 4850,
+    "Role players": 2504,
+    "Starters / Wings": 1366,
+    "Stars (high pts, mid reb)": 1210
+  },
+  "cluster_centroids": [
+    {
+      "pts_pg": 11.39456869946179,
+      "reb_pg": 3.6136723020221444,
+      "tov_pg": 1.6052392453456223,
+      "size": 2504,
+      "archetype": "Role players"
+    },
+    {
+      "pts_pg": 20.602898992366143,
+      "reb_pg": 6.138568992575609,
+      "tov_pg": 2.8053996490485753,
+      "size": 1210,
+      "archetype": "Stars (high pts, mid reb)"
+    },
+    {
+      "pts_pg": 11.631136569336709,
+      "reb_pg": 7.931255625459679,
+      "tov_pg": 1.5272603482463765,
+      "size": 1366,
+      "archetype": "Starters / Wings"
+    },
+    {
+      "pts_pg": 5.415352471448923,
+      "reb_pg": 2.79750989296688,
+      "tov_pg": 0.7965945314570209,
+      "size": 4850,
+      "archetype": "Bench / low usage"
+    }
+  ],
+  "regression_cv_r2_lr": 0.2516279390525894,
+  "regression_cv_r2_rf": 0.2248140243343013,
+  "regression_test_rmse_lr": 19.404424041377784,
+  "regression_test_mae_lr": 15.36540000765513,
+  "regression_test_r2_lr": 0.20619307702948142,
+  "regression_test_rmse_rf": 20.07487155427937,
+  "regression_test_mae_rf": 15.759904437585966,
+  "regression_test_r2_rf": 0.15039136183187019,
+  "regression_feature_importances": {
+    "home_team_recent_pts": 0.5391330542983479,
+    "away_team_recent_pts": 0.35071373521941573,
+    "away_team_recent_wins": 0.04058609561616016,
+    "season_year": 0.034888571346652006,
+    "home_team_recent_wins": 0.03203906334981693,
+    "is_playoff": 0.0026394801696072168
+  }
+}

@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Understanding the Modern NBA</title>
+  <meta
+    name="description"
+    content="CMSC 320 final tutorial on NBA history, data curation, exploratory analysis, and machine learning."
+  >
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap"
+    rel="stylesheet"
+  >
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="page-shell">
+    <header class="hero" id="top">
+      <div class="hero-copy">
+        <p class="eyebrow">CMSC 320 Final Tutorial - Pratham Ashar & Austin Thomas</p>
+        <h1>Understanding Today's NBA</h1>
+        <p class="lede">
+          This website is written as a step-by-step tutorial rather than a project summary. The goal
+          is to walk a reader from raw basketball data, through preprocessing and exploratory
+          analysis, into machine-learning models and final interpretation.
+        </p>
+        <div class="hero-meta">
+          <span>65,698 Games from the 1946/47 – 2022/23 seasons</span>
+        </div>
+        <div class="hero-actions">
+          <a class="button button-primary" href="#tutorial">Start Reading</a>
+          <a class="button button-secondary" href="CMSC320_Final_Project.html">Notebook-Style Export</a>
+        </div>
+      </div>
+      <aside class="hero-panel hero-visual">
+        <a
+          class="hero-photo"
+          href="https://images.seattletimes.com/wp-content/uploads/2023/10/urnpublicidap.orgf6b31a851edcc3ff1201e7be2035f16bLakers_Nuggets_Basketball_97301.jpg?d=780x520"
+          aria-label="Open the NBA hero image"
+        >
+          <span class="hero-photo-badge">Link</span>
+          <span class="hero-photo-caption">Source: Seattle Times</span>
+        </a>
+      </aside>
+    </header>
+
+    <main class="layout" id="tutorial">
+      <nav class="toc" aria-label="Table of contents">
+        <p class="toc-title">Tutorial Flow</p>
+        <a href="#contributions">Contributions</a>
+        <a href="#introduction">1. Introduction</a>
+        <a href="#curation">2. Data Curation</a>
+        <a href="#preprocessing">3. Preprocessing</a>
+        <a href="#eda">4. Exploratory Analysis</a>
+        <a href="#primary">5. Primary Analysis</a>
+        <a href="#visualization">6. Visualization</a>
+        <a href="#conclusion">7. Insights</a>
+      </nav>
+
+      <div class="content">
+        <section class="section" id="contributions">
+          <div class="section-heading">
+            <p class="section-kicker">Header</p>
+            <h2>Contributions and project roles</h2>
+          </div>
+          <div class="grid two-up">
+            <article class="card">
+              <h3>Pratham Ashar</h3>
+              <ul class="clean-list">
+                <li>A: Proposed the NBA topic and framed the core research questions.</li>
+                <li>B: Built the SQLite-to-analysis pipeline and organized the derived tables.</li>
+                <li>D: Designed the classification, clustering, and regression approach.</li>
+                <li>G: Wrote and assembled the final tutorial narrative.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Austin Thomas</h3>
+              <ul class="clean-list">
+                <li>C: Led the exploratory data analysis and summary-statistics conclusions.</li>
+                <li>E: Performed model training, validation, and test-set analysis.</li>
+                <li>F: Created major result figures and interpretation of outputs.</li>
+                <li>G: Helped revise the final report into publication form.</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <section class="section" id="introduction">
+          <div class="section-heading">
+            <p class="section-kicker">1. Introduction</p>
+            <h2>What we wanted to learn from historical NBA data</h2>
+          </div>
+          <div class="card narrative-card">
+            <p>
+              Basketball produces a rich, unusually detailed historical record. Every game ends with a
+              score, every season reflects a specific strategic era, and the play-by-play logs capture
+              event-level information about how points, rebounds, and turnovers are produced. That
+              makes the NBA a strong setting for a data-science tutorial.
+            </p>
+            <p>
+              We organized the project around three questions. First, can we predict whether the home
+              team wins using only information known before tip-off? Second, do player box-score
+              patterns reveal stable statistical archetypes? Third, how well can we predict the total
+              number of points scored in a game?
+            </p>
+            <p>
+              These questions matter because they mix descriptive and predictive goals. They let us ask
+              what changed in the league over time, what stayed stable, and how much of the game is
+              explainable with simple tabular features.
+            </p>
+          </div>
+          <div class="grid three-up">
+            <article class="card question-card">
+              <span class="question-index">Q1</span>
+              <h3>Home-win prediction</h3>
+              <p>Can recent team form and era effects explain the probability that the home team wins?</p>
+            </article>
+            <article class="card question-card">
+              <span class="question-index">Q2</span>
+              <h3>Player archetypes</h3>
+              <p>Can simple player-season box-score averages recover recognizable roles?</p>
+            </article>
+            <article class="card question-card">
+              <span class="question-index">Q3</span>
+              <h3>Total scoring</h3>
+              <p>How well can we predict a game’s final total, and which features matter most?</p>
+            </article>
+          </div>
+        </section>
+
+        <section class="section" id="curation">
+          <div class="section-heading">
+            <p class="section-kicker">2. Data Curation</p>
+            <h2>Choosing a dataset that supports both history and modeling</h2>
+          </div>
+          <div class="card narrative-card">
+            <p>
+              Our data comes from Wyatt Walsh’s
+              <a href="https://www.kaggle.com/datasets/wyattowalsh/basketball">NBA Historical Dataset</a>,
+              which aggregates data from the official NBA Stats API. We selected it for four reasons:
+              scale, historical depth, multiple grain levels, and a relatively clean relational
+              schema.
+            </p>
+            <p>
+              The tables most relevant to our analysis are `game`, `play_by_play`, `other_stats`, and
+              `common_player_info`. The `game` table gives us game-level targets; the `play_by_play`
+              table lets us reconstruct player-game contributions; and the player-information table
+              lets us move to season-level summaries.
+            </p>
+          </div>
+          <div class="step-block">
+            <div class="step-label">Step 2.1</div>
+            <div class="step-content">
+              <h3>Connect to the SQLite database</h3>
+              <p>
+                Before asking any basketball question, we need to verify what is actually in the
+                dataset and what level of granularity each table supports.
+              </p>
+<pre><code class="language-python">import sqlite3
+import pandas as pd
+
+DB_PATH = 'nba.sqlite'
+conn = sqlite3.connect(DB_PATH)
+
+tables = pd.read_sql(
+    "SELECT name FROM sqlite_master WHERE type='table'", conn
+)
+print(tables.to_string(index=False))</code></pre>
+              <p>
+                This matters because it determines what kinds of analysis are even possible. A project
+                built only on box scores would not support event-level parsing, while a project built
+                only on play-by-play would make simple game-level prediction more cumbersome.
+              </p>
+            </div>
+          </div>
+          <div class="step-block">
+            <div class="step-label">Step 2.2</div>
+            <div class="step-content">
+              <h3>Inspect the candidate tables</h3>
+              <p>
+                We next check column availability in the tables most likely to support our three
+                questions. This is where curation decisions begin: we do not need every field, but we
+                do need to know which tables contain team identity, dates, event types, and player
+                names.
+              </p>
+<pre><code class="language-python">for table in ['other_stats', 'play_by_play', 'common_player_info']:
+    df = pd.read_sql(f"SELECT * FROM {table} LIMIT 3", conn)
+    print(f"\\n=== {table} ===")
+    print(df.columns.tolist())</code></pre>
+              <p>
+                At this point, the project becomes concrete. We know that `game` can support
+                classification and regression, while `play_by_play` can support the derived
+                player-season analysis used in the archetype section.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="preprocessing">
+          <div class="section-heading">
+            <p class="section-kicker">3. Preprocessing</p>
+            <h2>Turning raw tables into analysis-ready frames</h2>
+          </div>
+          <div class="step-block">
+            <div class="step-label">Step 3.1</div>
+            <div class="step-content">
+              <h3>Load and normalize the game table</h3>
+              <p>
+                The game table is our backbone. We parse the date, derive a season label, convert
+                scores to numeric form, and remove rows without valid final scores.
+              </p>
+<pre><code class="language-python">games = pd.read_sql("SELECT * FROM game", conn)
+games['game_date'] = pd.to_datetime(games['game_date'], errors='coerce')
+games['season_year'] = games['game_date'].dt.year.where(
+    games['game_date'].dt.month &gt;= 10,
+    games['game_date'].dt.year - 1
+)
+for col in ['pts_home', 'pts_away']:
+    games[col] = pd.to_numeric(games[col], errors='coerce')
+games.dropna(subset=['pts_home', 'pts_away'], inplace=True)</code></pre>
+              <p>
+                This step seems simple, but it is critical. If the season label is wrong, then every
+                era-level plot and every time-aware train/test split becomes misleading.
+              </p>
+            </div>
+          </div>
+          <div class="step-block">
+            <div class="step-label">Step 3.2</div>
+            <div class="step-content">
+              <h3>Parse play-by-play rows into player-game statistics</h3>
+              <p>
+                The raw event table does not directly give us the player-season features we want. We
+                have to reconstruct them by classifying made field goals, free throws, rebounds, and
+                turnovers.
+              </p>
+<pre><code class="language-python">pbp = pd.read_sql(
+    """SELECT game_id, eventmsgtype, eventmsgactiontype,
+              player1_id, player1_name, player1_team_abbreviation,
+              homedescription, visitordescription, score
+       FROM play_by_play
+       WHERE eventmsgtype IN (1, 2, 3, 4, 5)""",
+    conn
+)
+
+made_shots = pbp[pbp['eventmsgtype'] == 1].copy()
+desc = made_shots['homedescription'].fillna('') + made_shots['visitordescription'].fillna('')
+made_shots['is_3pt'] = desc.str.contains('3PT', case=False).astype(int)
+made_shots['pts'] = made_shots['is_3pt'].map({1: 3, 0: 2})</code></pre>
+              <p>
+                This is the most “data science pipeline” part of the project. We are not just loading
+                a ready-made CSV; we are deciding how event codes should become basketball variables.
+              </p>
+            </div>
+          </div>
+          <div class="step-block">
+            <div class="step-label">Step 3.3</div>
+            <div class="step-content">
+              <h3>Build player-game and player-season tables</h3>
+              <p>
+                Once events are classified, we aggregate them to player-game rows and then to
+                player-season averages. This gives us the unit of analysis for our player-archetype
+                work.
+              </p>
+<pre><code class="language-python">box = scoring.merge(rebounds, on=['game_id','player1_id','player1_name'], how='outer')
+box = box.merge(turnovers, on=['game_id','player1_id','player1_name'], how='outer')
+box.rename(columns={'player1_name': 'player_name', 'player1_id': 'player_id'}, inplace=True)
+box[['pts','reb','tov']] = box[['pts','reb','tov']].fillna(0)
+
+player_season = (
+    box_with_season
+    .groupby(['player_name', 'player_id', 'season_year'])
+    .agg(
+        games_played=('pts', 'count'),
+        pts_pg=('pts', 'mean'),
+        reb_pg=('reb', 'mean'),
+        tov_pg=('tov', 'mean'),
+    )
+    .reset_index()
+)
+player_season = player_season[player_season['games_played'] &gt;= 20].copy()</code></pre>
+              <p>
+                The minimum-games threshold is important. Without it, short and noisy seasons would
+                dominate the tails of the distribution and make the player plots less trustworthy.
+              </p>
+            </div>
+          </div>
+          <div class="step-block">
+            <div class="step-label">Step 3.4</div>
+            <div class="step-content">
+              <h3>Create derived game-level targets</h3>
+              <p>
+                We also enrich the game table with exactly the targets we want to study later:
+                `total_pts`, `home_win`, and `point_diff`.
+              </p>
+<pre><code class="language-python">games['total_pts']  = games['pts_home'] + games['pts_away']
+games['home_win']   = (games['pts_home'] &gt; games['pts_away']).astype(int)
+games['point_diff'] = games['pts_home'] - games['pts_away']</code></pre>
+              <p>
+                This gives us a clean bridge from exploratory analysis to supervised learning. The
+                target variables are now explicit and queryable.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="eda">
+          <div class="section-heading">
+            <p class="section-kicker">4. Exploratory Data Analysis</p>
+            <h2>Using descriptive statistics and hypothesis testing to decide what matters</h2>
+          </div>
+          <div class="card narrative-card">
+            <p>
+              The exploratory stage answers two different questions. First, what does the dataset look
+              like numerically? Second, what patterns are strong enough to motivate a later machine
+              learning model? We therefore summarize the data and then present three specific
+              conclusions, each tied to a statistical method.
+            </p>
+          </div>
+          <div class="step-block">
+            <div class="step-label">Step 4.1</div>
+            <div class="step-content">
+              <h3>Start with summary statistics</h3>
+              <p>
+                Before running any test, we need to know whether the data has the right scale and
+                coverage for our project.
+              </p>
+<pre><code class="language-python">print('=== GAMES TABLE ===')
+display(
+    games[['pts_home', 'pts_away', 'total_pts', 'home_win', 'point_diff']]
+    .describe().round(2)
+)
+
+print(f'Unique players: {box[\"player_name\"].nunique():,}')
+print(f'Season range: {games[\"season_year\"].min()} – {games[\"season_year\"].max()}')
+print(f'Total games: {games.shape[0]:,}')</code></pre>
+              <p>
+                This is where we confirm that the dataset is large enough and broad enough to justify
+                both historical analysis and model fitting.
+              </p>
+            </div>
+          </div>
+
+          <article class="feature-block">
+            <div class="feature-copy">
+              <p class="mini-kicker">Conclusion 1</p>
+              <h3>Home teams do score more, and they win more often</h3>
+              <p>
+                We test whether home scoring exceeds away scoring using a one-sided two-sample
+                independent t-test.
+              </p>
+<pre><code class="language-python">home_pts = games['pts_home'].dropna()
+away_pts = games['pts_away'].dropna()
+
+t_stat, p_val = ttest_ind(home_pts, away_pts, alternative='greater')
+print(home_pts.mean(), away_pts.mean(), p_val)</code></pre>
+              <p>
+                The result is decisive: home teams average <strong>104.62</strong> points versus
+                <strong>100.99</strong> for away teams, and the p-value is effectively zero. But the
+                plot tells a richer story than the test alone: the home edge declines over time, which
+                means “home-court advantage” is real but historically unstable.
+              </p>
+            </div>
+            <figure class="figure-card">
+              <img src="assets/figures/eda_home_court.png" alt="Home versus away scoring distributions and era-level home win rates">
+              <figcaption>The test confirms the mean gap; the era bars show that the gap is shrinking.</figcaption>
+            </figure>
+          </article>
+
+          <article class="feature-block reverse">
+            <div class="feature-copy">
+              <p class="mini-kicker">Conclusion 2</p>
+              <h3>The scoring environment changed, but not as a simple upward line</h3>
+              <p>
+                We first tried a Pearson correlation between season year and average total points in
+                the post-1980 era.
+              </p>
+<pre><code class="language-python">modern = season_scoring[season_scoring['season_year'] &gt;= 1980].copy()
+r, p = pearsonr(modern['season_year'], modern['avg_total_pts'])
+print(f'Pearson r = {r:.4f}, p = {p:.4e}')</code></pre>
+              <p>
+                This produced one of the most interesting surprises in the project. Visually, scoring
+                absolutely changes across eras. But the simple post-1980 linear relationship is weak
+                and not statistically significant in the rerun. That forced us to refine our
+                interpretation: the right story is about era shifts, not one monotonic trend.
+              </p>
+            </div>
+            <figure class="figure-card">
+              <img src="assets/figures/eda_scoring_revolution.png" alt="Scoring trends over time and home-away scoring by season">
+              <figcaption>The visual evidence supports structural shifts in the league, even though a single linear test is too blunt.</figcaption>
+            </figure>
+          </article>
+
+          <article class="feature-block">
+            <div class="feature-copy">
+              <p class="mini-kicker">Conclusion 3</p>
+              <h3>Player-season box scores have meaningful statistical structure</h3>
+              <p>
+                We test dependence between high scorers and high rebounders using a chi-square test and
+                complement it with a correlation view.
+              </p>
+<pre><code class="language-python">ps['high_scorer'] = (ps['pts_pg'] &gt;= ps['pts_pg'].quantile(0.75)).astype(int)
+ps['high_rebounder'] = (ps['reb_pg'] &gt;= ps['reb_pg'].quantile(0.75)).astype(int)
+
+ct = pd.crosstab(ps['high_scorer'], ps['high_rebounder'])
+chi2, p_chi, dof, expected = chi2_contingency(ct)</code></pre>
+              <p>
+                The point is not just that the p-value is small. The more important result is that the
+                player-stat space is visibly organized. Points, rebounds, and turnovers do not vary
+                independently, which makes clustering a reasonable next step.
+              </p>
+            </div>
+            <figure class="figure-card">
+              <img src="assets/figures/eda_player_archetypes.png" alt="Correlation heatmap and player points versus rebounds scatter">
+              <figcaption>Even a simple three-feature player profile shows clear structure and dependence.</figcaption>
+            </figure>
+          </article>
+
+          <article class="feature-block reverse">
+            <div class="feature-copy">
+              <p>
+                We also check whether the highest-scoring player seasons are just noise or genuine
+                outliers. They turn out to be genuine outliers, which helps justify later role-based
+                interpretation.
+              </p>
+<pre><code class="language-python">top10 = ps.nlargest(10, 'pts_pg')[['player_name', 'season_year', 'pts_pg']]
+ps['pts_z'] = stats.zscore(ps['pts_pg'].fillna(0))
+outliers = ps[ps['pts_z'] &gt; 3]</code></pre>
+              <p>
+                That is useful for the tutorial because it shows that the player-level dataset contains
+                historically meaningful extremes, not just smooth averages.
+              </p>
+            </div>
+            <figure class="figure-card">
+              <img src="assets/figures/eda_scoring_outliers.png" alt="Top player scoring seasons and scoring distribution">
+              <figcaption>Elite scoring seasons sit far into the right tail, which makes them analytically interesting rather than suspicious.</figcaption>
+            </figure>
+          </article>
+        </section>
+
+        <section class="section" id="primary">
+          <div class="section-heading">
+            <p class="section-kicker">5. Primary Analysis</p>
+            <h2>Choosing models that match the questions we asked</h2>
+          </div>
+          <div class="card narrative-card">
+            <p>
+              The EDA stage told us three things. Home-court advantage is real but shrinking, scoring
+              behaves in eras, and player statistics are structurally related. Those findings directly
+              motivate our model choices: classification for home wins, clustering for player roles,
+              and regression for total points.
+            </p>
+          </div>
+
+          <div class="step-block">
+            <div class="step-label">Step 5.1</div>
+            <div class="step-content">
+              <h3>Build rolling pre-game features for home-win prediction</h3>
+              <p>
+                We deliberately restrict the classification task to information knowable before the
+                game starts. That makes the prediction problem honest.
+              </p>
+<pre><code class="language-python">clf_games = games[games['season_year'] &gt;= 1980].copy()
+clf_games['is_playoff'] = clf_games['game_id'].astype(str).str.startswith('004').astype(int)
+
+clf_features = [
+    'season_year', 'is_playoff',
+    'home_team_recent_pts', 'away_team_recent_pts',
+    'home_team_recent_wins', 'away_team_recent_wins'
+]</code></pre>
+              <p>
+                We then use a time-aware split, training on 1980–2016 and testing on 2017–2022. This
+                avoids leaking future seasons into the past.
+              </p>
+            </div>
+          </div>
+
+          <article class="feature-block">
+            <div class="feature-copy">
+              <p class="mini-kicker">Classification</p>
+              <h3>Predicting whether the home team wins</h3>
+              <p>
+                We fit logistic regression for interpretability and random forest for non-linear
+                flexibility.
+              </p>
+<pre><code class="language-python">logreg = LogisticRegression(max_iter=1000, random_state=RANDOM_STATE)
+logreg.fit(X_train_scaled, y_train)
+
+rf = RandomForestClassifier(
+    n_estimators=300, max_depth=8, min_samples_leaf=20,
+    random_state=RANDOM_STATE, n_jobs=-1
+)
+rf.fit(X_train, y_train)</code></pre>
+              <p>
+                Both models end up near <strong>0.637 ROC-AUC</strong> on the held-out test set. That
+                is better than chance and better than the naive “always pick home” baseline, but it is
+                still modest. The interpretation is that recent form matters, yet a large fraction of
+                NBA game outcomes remains noisy at this feature level.
+              </p>
+            </div>
+            <figure class="figure-card">
+              <img src="assets/figures/classification_results.png" alt="Classification results including ROC curves and feature effects">
+              <figcaption>Recent win rate and recent scoring are more influential than the playoff flag, and the gains over baseline are real but limited.</figcaption>
+            </figure>
+          </article>
+
+          <div class="step-block">
+            <div class="step-label">Step 5.2</div>
+            <div class="step-content">
+              <h3>Use clustering to look for player archetypes</h3>
+              <p>
+                The player question is unsupervised: we do not already know the “correct” labels. That
+                makes K-Means a natural choice for discovering broad statistical roles.
+              </p>
+<pre><code class="language-python">ps_clust = player_season.dropna(subset=['pts_pg', 'reb_pg', 'tov_pg']).copy()
+X_clust = StandardScaler().fit_transform(ps_clust[['pts_pg', 'reb_pg', 'tov_pg']])
+
+for k in range(2, 9):
+    km = KMeans(n_clusters=k, random_state=RANDOM_STATE, n_init=10)
+    labels = km.fit_predict(X_clust)</code></pre>
+              <p>
+                In the full notebook, this section chooses a small number of clusters, projects them
+                with PCA, and interprets them as stars, wings, role players, and lower-usage bench
+                types. Even before the final clustering labels, the EDA already showed why the method
+                is plausible.
+              </p>
+            </div>
+          </div>
+
+          <div class="step-block">
+            <div class="step-label">Step 5.3</div>
+            <div class="step-content">
+              <h3>Predict the total number of points in a game</h3>
+              <p>
+                Total points is a continuous target, so we switch to regression. We re-use the same
+                rolling pre-game features and compare linear regression with random forest regression.
+              </p>
+<pre><code class="language-python">lr = LinearRegression()
+lr.fit(X_train_r_scaled, y_train_r)
+y_pred_lr = lr.predict(X_test_r_scaled)
+
+rfr = RandomForestRegressor(
+    n_estimators=300, max_depth=10, min_samples_leaf=20,
+    random_state=RANDOM_STATE, n_jobs=-1
+)
+rfr.fit(X_train_r, y_train_r)
+y_pred_rfr = rfr.predict(X_test_r)</code></pre>
+              <p>
+                The rerun results are more modest than our early expectations. Linear regression
+                performs slightly better than the random forest here, with about
+                <strong>15.37 MAE</strong> and <strong>R² = 0.21</strong>. That means the model captures
+                some scoring structure but leaves a great deal unexplained.
+              </p>
+            </div>
+          </div>
+
+          <article class="feature-block reverse">
+            <div class="feature-copy">
+              <p class="mini-kicker">Regression</p>
+              <h3>Game-total prediction works, but only weakly</h3>
+              <p>
+                The regression plots make this limitation visible. The model tracks average season
+                scoring reasonably well, but the individual-game scatter remains wide and residual
+                spread is substantial.
+              </p>
+              <p>
+                That is still useful. It tells us that recent offensive environment is a real signal,
+                just not a sufficient one for tight prediction.
+              </p>
+            </div>
+            <figure class="figure-card">
+              <img src="assets/figures/regression_results.png" alt="Regression diagnostics for predicting total points">
+              <figcaption>Recent scoring features dominate the model, while variance at the single-game level remains high.</figcaption>
+            </figure>
+          </article>
+        </section>
+
+        <section class="section" id="visualization">
+          <div class="section-heading">
+            <p class="section-kicker">6. Visualization</p>
+            <h2>Putting the entire pipeline back on one page</h2>
+          </div>
+          <div class="card narrative-card">
+            <p>
+              The final visualization task is not just to make pretty plots. It is to synthesize the
+              full story: historical context, EDA findings, and predictive performance. The scoreboard
+              below does that by placing the two supervised-learning tasks side by side.
+            </p>
+          </div>
+          <figure class="figure-card wide-figure">
+            <img src="assets/figures/model_scoreboard.png" alt="Model scoreboard for home-win and total-points analysis">
+            <figcaption>The classification task improves over a naive baseline, while the regression task remains materially noisy.</figcaption>
+          </figure>
+          <div class="card narrative-card">
+            <h3>Why keep the notebook export too?</h3>
+            <p>
+              This page is the guided narrative version of the project. The full exported notebook at
+              <a href="CMSC320_Final_Project.html">CMSC320_Final_Project.html</a> preserves the
+              complete mixed prose-and-code artifact required by the assignment. Together, they give a
+              reader both the polished story and the underlying computational walkthrough.
+            </p>
+          </div>
+        </section>
+
+        <section class="section" id="conclusion">
+          <div class="section-heading">
+            <p class="section-kicker">7. Insights and Conclusions</p>
+            <h2>What an informed reader should take away</h2>
+          </div>
+          <div class="grid two-up">
+            <article class="card">
+              <h3>Main takeaways</h3>
+              <ul class="clean-list">
+                <li>Home-court advantage is statistically significant but historically weaker than it used to be.</li>
+                <li>League scoring changes are better described as era shifts than as one smooth linear rise.</li>
+                <li>Player-season box scores contain meaningful role structure and real outliers.</li>
+                <li>Simple pre-game models improve on naive baselines, but they do not come close to perfect prediction.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>What we would do next</h3>
+              <ul class="clean-list">
+                <li>Add richer player and team features such as assists, shooting efficiency, rest, and injuries.</li>
+                <li>Push further into sequence modeling with the play-by-play table.</li>
+                <li>Refine the player-archetype section with a fully regenerated clustering pipeline.</li>
+                <li>Compare modern-only and cross-era models more explicitly.</li>
+              </ul>
+            </article>
+          </div>
+          <div class="card quote-card">
+            <p>
+              The strongest lesson from the project is that careful data curation and step-by-step exploration let us separate strong
+              historical structure from irreducible uncertainty, allowing us to build powerful predictive models.
+            </p>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <p>Built from the repository notebook, generated figures, and exported tutorial artifacts.</p>
+      <a href="#top">Back to top</a>
+    </footer>
+  </div>
+</body>
+</html>

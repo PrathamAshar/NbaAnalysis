@@ -1,0 +1,23 @@
+# Local tooling and editor artifacts
+.codex/
+.venv/
+.DS_Store
+Thumbs.db
+
+# Python cache/build artifacts
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.ipynb_checkpoints/
+
+# Local/generated analysis artifacts not needed in the final repo
+extracted_figures/
+scripts/__pycache__/
+
+# Large raw data files that should not be pushed with the final GitHub Pages repo
+csv/
+nba.sqlite
+
+# Course instructions / local reference docs
+Final Project Assignment-2-2.pdf
