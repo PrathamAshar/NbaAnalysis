@@ -9406,7 +9406,7 @@ The two-sample t-test is highly significant (p ≪ 0.001). Home teams outscore t
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <hr/>
-<h3 id="4.3-Conclusion-2-%E2%80%94-NBA-Scoring-Has-Risen-in-the-Modern-Era-(The-Three-Point-Revolution)">4.3 Conclusion 2 — NBA Scoring Has Risen in the Modern Era (The Three-Point Revolution)<a class="anchor-link" href="#4.3-Conclusion-2-%E2%80%94-NBA-Scoring-Has-Risen-in-the-Modern-Era-(The-Three-Point-Revolution)">¶</a></h3><p><strong>Method: Pearson correlation</strong> between season year and average total points per game (post-1980 era).</p>
+<h3 id="4.3-Conclusion-2-%E2%80%94-NBA-Scoring-Changes-Across-Eras,-But-Not-as-One-Simple-Linear-Trend">4.3 Conclusion 2 — NBA Scoring Changes Across Eras, But Not as One Simple Linear Trend<a class="anchor-link" href="#4.3-Conclusion-2-%E2%80%94-NBA-Scoring-Changes-Across-Eras,-But-Not-as-One-Simple-Linear-Trend">¶</a></h3><p><strong>Method: Pearson correlation</strong> between season year and average total points per game (post-1980 era).</p>
 <ul>
 <li><strong>H₀:</strong> ρ = 0 (no linear relationship between year and scoring)</li>
 <li><strong>H₁:</strong> ρ ≠ 0</li>
@@ -9539,11 +9539,11 @@ For the <strong>post-1980 Pearson correlation test</strong>, we <strong>fail to 
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <hr/>
-<h3 id="4.4-Conclusion-3-%E2%80%94-Player-Statistical-Archetypes-Exist:-Scoring-&amp;-Assists-Are-Non-Independent">4.4 Conclusion 3 — Player Statistical Archetypes Exist: Scoring &amp; Assists Are Non-Independent<a class="anchor-link" href="#4.4-Conclusion-3-%E2%80%94-Player-Statistical-Archetypes-Exist:-Scoring-&amp;-Assists-Are-Non-Independent">¶</a></h3><p><strong>Method: Chi-square test of independence</strong><br/>
-We ask: are being a "high scorer" (top-25th percentile pts/g) and being a "high-assist" player (top-25th percentile ast/g) statistically independent?<br/>
+<h3 id="4.4-Conclusion-3-%E2%80%94-Player-Statistical-Archetypes-Exist:-Scoring-&amp;-Rebounding-Are-Non-Independent">4.4 Conclusion 3 — Player Statistical Archetypes Exist: Scoring &amp; Rebounding Are Non-Independent<a class="anchor-link" href="#4.4-Conclusion-3-%E2%80%94-Player-Statistical-Archetypes-Exist:-Scoring-&amp;-Rebounding-Are-Non-Independent">¶</a></h3><p><strong>Method: Chi-square test of independence</strong><br/>
+We ask: are being a "high scorer" (top-25th percentile pts/g) and being a "high rebounder" (top-25th percentile reb/g) statistically independent?<br/>
 We complement this with a full pairwise correlation matrix.</p>
 <ul>
-<li><strong>H₀:</strong> High-scoring and high-assist classification are independent</li>
+<li><strong>H₀:</strong> High-scoring and high-rebounding classification are independent</li>
 <li><strong>H₁:</strong> They are not independent</li>
 </ul>
 </div>
@@ -10671,14 +10671,15 @@ The chi-square test strongly rejects independence (<code>p ≪ 0.001</code>). In
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p><strong>5.1 Findings.</strong> The Random Forest achieves a test-set ROC-AUC around 0.66–0.70 and an accuracy that meaningfully beats the naive "always pick home" baseline. The logistic regression coefficients tell a clear story:</p>
+<p><strong>5.1 Findings.</strong> On the held-out 2017–2022 test set, both models perform slightly better than the naive "always pick home" baseline, but the improvement is modest rather than dramatic. Logistic Regression and Random Forest each land at about <strong>0.637 ROC-AUC</strong>, while accuracy rises from the baseline home-win rate of about <strong>56.4%</strong> to roughly <strong>60.7–60.9%</strong>.</p>
+<p>The feature effects still tell a useful story:</p>
 <ul>
-<li><strong>Recent home-team win rate</strong> has the strongest <em>positive</em> coefficient — teams that have been winning lately tend to keep winning.</li>
-<li><strong>Recent away-team win rate</strong> has the strongest <em>negative</em> coefficient (the away team being good lowers the home team's win probability).</li>
-<li><strong>Season year</strong> has a small negative coefficient, consistent with our EDA finding that home-court advantage has eroded over time.</li>
-<li><strong>Playoff games</strong> show a slight home-court boost (perhaps because the higher seed gets the home games).</li>
+<li><strong>Recent home-team win rate</strong> has the strongest <em>positive</em> effect — teams that have been winning lately are more likely to keep winning.</li>
+<li><strong>Recent away-team win rate</strong> has the strongest <em>negative</em> effect — stronger away teams reduce the home team's probability of winning.</li>
+<li><strong>Season year</strong> has a small negative effect, which is consistent with our EDA finding that home-court advantage has weakened over time.</li>
+<li><strong>Playoff games</strong> contribute relatively little compared with recent team form.</li>
 </ul>
-<p>The fact that we <em>cannot</em> push accuracy much above ~62% even with a tuned random forest is itself an important finding: a great deal of game-to-game variation is genuinely random or driven by features we don't have (injuries, rest, travel). This is consistent with what professional sports betting markets show — even sharp models for NBA games rarely exceed 65–67% accuracy against the spread.</p>
+<p>The main takeaway is not that we found a highly accurate NBA prediction engine. It is that pre-tip-off features do contain real signal, but much of game-to-game outcome variation remains unexplained at this feature level. That makes the classification task meaningful, while also showing the limits of a small, interpretable feature set.</p>
 <hr/>
 </div>
 </div>
@@ -11102,14 +11103,14 @@ The chi-square test strongly rejects independence (<code>p ≪ 0.001</code>). In
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p><strong>5.3 Findings.</strong> Both models substantially outperform the naive "always predict the training mean" baseline, with the Random Forest edging out Linear Regression — indicating that some non-linear interactions between features carry signal. The MAE around 9–11 points means our typical prediction is within ~10 points of the actual game total, on a target whose typical value is in the low 200s. That's roughly 4–5% relative error.</p>
-<p>The feature importance analysis confirms what the EDA suggested:</p>
+<p><strong>5.3 Findings.</strong> On the held-out test set, both regression models beat the naive "always predict the training mean" baseline, but performance is notably weaker than our earlier draft prose suggested. In fact, <strong>Linear Regression slightly outperforms Random Forest</strong> here: Linear Regression achieves about <strong>15.37 MAE</strong> with <strong>R² = 0.21</strong>, while Random Forest comes in around <strong>15.76 MAE</strong> with <strong>R² = 0.15</strong>.</p>
+<p>The feature importance analysis still confirms what the EDA suggested:</p>
 <ul>
-<li><strong><code>season_year</code></strong> is one of the most important predictors — the era effect is real and large.</li>
-<li><strong>Recent scoring averages</strong> (both teams) carry substantial signal — fast-paced teams produce high-total games.</li>
-<li><strong>Playoff status</strong> has small but measurable importance (playoffs typically score slightly less due to tighter defense).</li>
+<li><strong>Recent scoring averages</strong> for the home and away teams carry the most predictive signal.</li>
+<li><strong>Season year</strong> still matters, but more as an era proxy than as proof of one clean linear scoring trend.</li>
+<li><strong>Playoff status</strong> has comparatively small importance in this reduced feature set.</li>
 </ul>
-<p>The right-bottom panel (predictions vs. actuals by test season) shows that the model captures the upward trend, although it slightly underpredicts the most extreme high-scoring seasons. This is a classic "regression to the mean" effect — the model is conservative about extrapolating beyond what it saw in training.</p>
+<p>The season-by-season prediction plot shows that the models capture broad changes in average scoring environment, but the individual-game scatter and residuals remain wide. So the right interpretation is that game-total prediction is possible in a weak-to-moderate sense, not that we solved the problem with high precision.</p>
 <hr/>
 </div>
 </div>
