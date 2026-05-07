@@ -9394,7 +9394,7 @@ p-value     : 0.0000e+00
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <p><strong>Conclusion 1 Summary:</strong><br/>
-The two-sample t-test is highly significant (p ≪ 0.001). Home teams outscore their opponents by roughly 2–3 points per game on average, and win &gt; 55% of games across all eras. Interestingly, the home win rate has been declining in recent decades — likely due to improved travel, schedule equity, and the 2020 NBA bubble (no fans). Home-court advantage is real but shrinking.</p>
+The two-sample t-test is highly significant (<code>p ≪ 0.001</code>). Home teams outscore away teams by roughly <strong>3.6 points per game on average</strong>, and the overall home win rate in the full dataset is <strong>61.9%</strong>. The era breakdown is even more informative: home win rate declines from about <strong>68.3%</strong> in 1947–69 to <strong>64.5%</strong> in 1970–89, <strong>60.6%</strong> in 1990–2009, and <strong>57.5%</strong> in 2010–22. Home-court advantage is therefore real, statistically significant, and historically shrinking rather than constant.</p>
 </div>
 </div>
 </div>
@@ -10671,7 +10671,7 @@ The chi-square test strongly rejects independence (<code>p ≪ 0.001</code>). In
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p><strong>5.1 Findings.</strong> On the held-out 2017–2022 test set, both models perform slightly better than the naive "always pick home" baseline, but the improvement is modest rather than dramatic. Logistic Regression and Random Forest each land at about <strong>0.637 ROC-AUC</strong>, while accuracy rises from the baseline home-win rate of about <strong>56.4%</strong> to roughly <strong>60.7–60.9%</strong>.</p>
+<p><strong>5.1 Findings.</strong> On the held-out 2017–2022 test set, both models perform slightly better than the naive "always pick home" baseline, but the improvement is modest rather than dramatic. Logistic Regression and Random Forest each land at about <strong>0.637 ROC-AUC</strong>, while accuracy rises from the baseline home-win rate of about <strong>56.4%</strong> to roughly <strong>60.7–60.9%</strong>. The fact that this test-set home-win baseline is lower than the <strong>61.9%</strong> all-time rate from Section 4.2 is not a contradiction; it reflects the same historical pattern we saw in the EDA, namely that home-court advantage has weakened in recent decades and the test set consists only of the modern 2017–2022 era.</p>
 <p>The feature effects still tell a useful story:</p>
 <ul>
 <li><strong>Recent home-team win rate</strong> has the strongest <em>positive</em> effect — teams that have been winning lately are more likely to keep winning.</li>
@@ -10766,7 +10766,7 @@ The chi-square test strongly rejects independence (<code>p ≪ 0.001</code>). In
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Inspect the diagnostics above. The silhouette score typically peaks at a low <code>k</code> and the elbow plot bends around <code>k=3</code> or <code>k=4</code>. We proceed with <strong><code>k=4</code></strong> because (a) it gives a competitive silhouette score, (b) it produces clusters that are easier to label semantically, and (c) basketball domain knowledge suggests roughly four archetypes (high-volume scorers, role-playing wings, big men, low-usage bench players). If you re-run on a slightly different feature set and your best <code>k</code> shifts, that's expected — <code>k=4</code> is a reasonable, defensible default for this dataset.</p>
+<p>Inspect the diagnostics above. In our rerun, the silhouette score is actually highest at <strong><code>k=2</code></strong> (about <strong>0.487</strong>), while the scores for <strong><code>k=3</code></strong>, <strong><code>k=4</code></strong>, and <strong><code>k=5</code></strong> are all lower and very similar (about <strong>0.362</strong>, <strong>0.361</strong>, and <strong>0.362</strong>). That means the strongest purely geometric split in this 3-feature space is a coarse 2-group separation. However, the elbow plot bends around <code>k=3</code> or <code>k=4</code>, and <strong><code>k=4</code></strong> gives a much more interpretable basketball breakdown. We therefore use <strong><code>k=4</code></strong> as a domain-informed modeling choice: it is not the silhouette optimum, but it does produce richer and more readable archetypes (stars, rebound-heavy starters, role players, and low-usage bench players). If you re-run on a slightly different feature set and your best <code>k</code> shifts, that's expected - the exact cluster count is somewhat subjective here, and <code>k=4</code> should be read as a practical choice rather than a mathematically unique answer.</p>
 </div>
 </div>
 </div>
@@ -10908,14 +10908,15 @@ The chi-square test strongly rejects independence (<code>p ≪ 0.001</code>). In
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p><strong>5.2 Findings.</strong> K-Means with <code>k=4</code> produces interpretable clusters that line up with basketball common sense:</p>
+<p><strong>5.2 Findings.</strong> The diagnostics tell a slightly nuanced story. If we cared only about the silhouette score, we would prefer <code>k=2</code>. But because the elbow bends around <code>k=3</code> to <code>k=4</code> and the 4-cluster solution is much easier to interpret in basketball terms, we proceed with <code>k=4</code> as a practical compromise between separation and interpretability.</p>
+<p>With that choice, K-Means produces four clusters that line up with basketball common sense:</p>
 <ul>
 <li><strong>Stars</strong> — high points, moderate rebounds, higher turnovers (because they handle the ball more). These are franchise-defining scorers.</li>
 <li><strong>Starters / Wings</strong> — moderate-to-high in everything; well-rounded contributors.</li>
 <li><strong>Role players</strong> — modest scoring, modest rebounding, low turnovers (they don't handle the ball much).</li>
 <li><strong>Bench / low-usage</strong> — small numbers across the board; players who get limited minutes.</li>
 </ul>
-<p>The PCA projection confirms that the first two principal components together explain a large fraction of the total variance, meaning the 3D feature space really is well-summarized by a 2D plot. The centroid plot on the right makes the archetype profiles concrete.</p>
+<p>The PCA projection confirms that the first two principal components together explain a large fraction of the total variance - about <strong>94.0%</strong> in total, with <strong>73.5%</strong> from PC1 and <strong>20.5%</strong> from PC2 - so the 3D feature space is genuinely well-summarized by a 2D plot. The centroid plot on the right makes the archetype profiles concrete: the "Stars" cluster averages about <strong>20.6 points</strong>, <strong>6.1 rebounds</strong>, and <strong>2.8 turnovers</strong> per game, while the "Bench / low usage" cluster sits much lower across all three statistics.</p>
 <p>A clear caveat: our feature set is intentionally small (only 3 stats — points, rebounds, turnovers). With richer features (assists, steals, blocks, FG%, 3P%, position) we could likely separate, say, "primary ball handlers" from "wing scorers" or "stretch bigs" from "traditional centers." But even with this minimal feature set, the clusters are meaningful — which is itself evidence that basketball roles are quite separable.</p>
 <hr/>
 </div>
@@ -10932,7 +10933,7 @@ The chi-square test strongly rejects independence (<code>p ≪ 0.001</code>). In
 <p><strong>Why regression?</strong> Total points is a continuous numeric target, so this is a regression problem. We use:</p>
 <ul>
 <li><strong>Linear Regression</strong> as an interpretable baseline.</li>
-<li><strong>Random Forest Regressor</strong>, which can capture non-linearities (e.g., the post-2015 scoring spike is not a simple linear function of year).</li>
+<li><strong>Random Forest Regressor</strong>, which can capture non-linearities in the scoring environment (for example, shifts that are not well described by a single straight-line trend, as we saw in Conclusion 2).</li>
 </ul>
 <p>Total-points prediction is a real-world problem: betting markets price every NBA game with an "over/under" line for total points, and the average sportsbook line beats most simple statistical models. We are not trying to beat Las Vegas, but we <em>are</em> trying to extract interpretable information about what drives scoring.</p>
 <h4 id="Features">Features<a class="anchor-link" href="#Features">¶</a></h4><p>We re-use the rolling team-pace features from Section 5.1 and add an interaction-friendly form:</p>
@@ -11103,7 +11104,7 @@ The chi-square test strongly rejects independence (<code>p ≪ 0.001</code>). In
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p><strong>5.3 Findings.</strong> On the held-out test set, both regression models beat the naive "always predict the training mean" baseline, but performance is notably weaker than our earlier draft prose suggested. In fact, <strong>Linear Regression slightly outperforms Random Forest</strong> here: Linear Regression achieves about <strong>15.37 MAE</strong> with <strong>R² = 0.21</strong>, while Random Forest comes in around <strong>15.76 MAE</strong> with <strong>R² = 0.15</strong>.</p>
+<p><strong>5.3 Findings.</strong> On the held-out test set, both regression models beat the naive "always predict the training mean" baseline, but performance is notably weaker than our earlier draft prose suggested. In fact, <strong>Linear Regression slightly outperforms Random Forest</strong> here: Linear Regression achieves about <strong>15.37 MAE</strong> with <strong>R² = 0.21</strong>, while Random Forest comes in around <strong>15.76 MAE</strong> with <strong>R² = 0.15</strong>. With only six features and substantial irreducible noise in NBA game totals, the Random Forest's flexibility appears to translate into mild overfitting, while Linear Regression's simpler functional form generalizes slightly better. That is a useful reminder that "more flexible" does not automatically mean "more accurate."</p>
 <p>The feature importance analysis still confirms what the EDA suggested:</p>
 <ul>
 <li><strong>Recent scoring averages</strong> for the home and away teams carry the most predictive signal.</li>
@@ -11228,7 +11229,7 @@ The chi-square test strongly rejects independence (<code>p ≪ 0.001</code>). In
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <hr/>
 <h2 id="7.-Insights-and-Conclusions">7. Insights and Conclusions<a class="anchor-link" href="#7.-Insights-and-Conclusions">¶</a></h2><h3 id="What-the-analysis-showed">What the analysis showed<a class="anchor-link" href="#What-the-analysis-showed">¶</a></h3><p>We started this tutorial with three questions, and the data + models gave us three answers:</p>
-<p><strong>1. Predicting home wins is meaningful but capped.</strong> Our supervised models perform better than the naive "always pick the home team" baseline, which means recent team form and home-court context do contain real predictive signal. At the same time, the held-out performance is still far from perfect, reminding us that NBA outcomes depend on many game-specific factors that are not captured by a small pre-tip-off feature set.</p>
+<p><strong>1. Predicting home wins is meaningful but capped.</strong> Our supervised models perform better than the naive "always pick the home team" baseline, which means recent team form and home-court context do contain real predictive signal. The lower modern-era test-set home-win rate relative to the all-time average is itself informative: it reflects the same decline in home-court advantage that appeared in the EDA. At the same time, the held-out performance is still far from perfect, reminding us that NBA outcomes depend on many game-specific factors that are not captured by a small pre-tip-off feature set.</p>
 <p><strong>2. The scoring story is about eras, not one simple straight-line trend.</strong> The visual history of NBA scoring clearly shows major changes in style and pace across decades. However, our post-1980 Pearson correlation test does <strong>not</strong> find a statistically significant linear relationship between season year and average total points, so we should <strong>fail to reject the null hypothesis</strong> for that specific test. The right interpretation is therefore that scoring changes are real, but they are better understood as nonlinear era shifts than as one continuous linear rise.</p>
 <p><strong>3. Player box-score features contain genuine structural information.</strong> Our chi-square test and correlation analysis show that high scoring and high rebounding are not independent in the player-season data. Combined with the outlier analysis, this suggests that even a small set of box-score features contains enough structure to support meaningful clustering and role discovery.</p>
 <h3 id="Limitations-and-caveats">Limitations and caveats<a class="anchor-link" href="#Limitations-and-caveats">¶</a></h3><ul>

@@ -542,7 +542,10 @@ rf.fit(X_train, y_train)</code></pre>
                 Both models end up near <strong>0.637 ROC-AUC</strong> on the held-out test set. That
                 is better than chance and better than the naive “always pick home” baseline, but it is
                 still modest. The interpretation is that recent form matters, yet a large fraction of
-                NBA game outcomes remains noisy at this feature level.
+                NBA game outcomes remains noisy at this feature level. The test-set home-win rate of
+                <strong>56.4%</strong> is also lower than the all-time <strong>61.9%</strong> rate from
+                Section 4.2 because this split only covers the modern 2017–2022 seasons, when home-court
+                advantage is weaker than it was historically.
               </p>
             </div>
             <figure class="figure-card">
@@ -566,13 +569,54 @@ for k in range(2, 9):
     km = KMeans(n_clusters=k, random_state=RANDOM_STATE, n_init=10)
     labels = km.fit_predict(X_clust)</code></pre>
               <p>
-                In the full notebook, this section chooses a small number of clusters, projects them
-                with PCA, and interprets them as stars, wings, role players, and lower-usage bench
-                types. Even before the final clustering labels, the EDA already showed why the method
-                is plausible.
+                The diagnostics matter here. In our rerun, the silhouette score is actually highest at
+                <strong>k = 2</strong> at about <strong>0.487</strong>, while
+                <strong>k = 3</strong>, <strong>k = 4</strong>, and <strong>k = 5</strong> all sit much
+                lower and very close together near <strong>0.36</strong>. So the strongest purely
+                geometric split is a coarse 2-group separation. We still proceed with
+                <strong>k = 4</strong> because the elbow bends around 3 to 4 clusters and the 4-cluster
+                solution is much easier to interpret in basketball terms. In other words, <strong>k = 4
+                is a domain-informed choice for readability, not a strict silhouette optimum.</strong>
               </p>
             </div>
           </div>
+
+          <figure class="figure-card">
+            <img src="assets/figures/clustering_diagnostics.png" alt="Elbow and silhouette diagnostics for choosing the number of clusters">
+            <figcaption>
+              Silhouette clearly prefers <strong>k = 2</strong>, but the elbow curve starts to flatten
+              around <strong>k = 3</strong> to <strong>k = 4</strong>, which is why we treat 4 clusters
+              as an interpretability choice rather than a mathematically unique answer.
+            </figcaption>
+          </figure>
+
+          <article class="feature-block">
+            <div class="feature-copy">
+              <p class="mini-kicker">Clustering</p>
+              <h3>The 4-cluster solution is visually clean and semantically richer</h3>
+              <p>
+                Once we accept that tradeoff, the resulting archetypes are useful. The PCA projection is
+                clean, and the first two components explain about <strong>94.0%</strong> of the variance
+                in the 3-feature space, so the 2D view is a fair summary rather than a misleading
+                projection.
+              </p>
+              <p>
+                The centroid profiles are also easy to read: the <strong>Stars</strong> cluster averages
+                about <strong>20.6 points</strong>, <strong>6.1 rebounds</strong>, and
+                <strong>2.8 turnovers</strong> per game, while the <strong>Bench / low usage</strong>
+                cluster sits much lower across all three statistics. The other two clusters split into a
+                rebound-heavier starter group and a lighter-usage role-player group.
+              </p>
+            </div>
+            <figure class="figure-card">
+              <img src="assets/figures/clustering_results.png" alt="PCA scatter of player archetypes and centroid profile chart">
+              <figcaption>
+                The PCA scatter and centroid bars make the interpretation concrete: stars, rebound-heavy
+                starters, role players, and low-usage bench seasons separate well enough to tell a
+                coherent basketball story.
+              </figcaption>
+            </figure>
+          </article>
 
           <div class="step-block">
             <div class="step-label">Step 5.3</div>
@@ -596,7 +640,11 @@ y_pred_rfr = rfr.predict(X_test_r)</code></pre>
                 The rerun results are more modest than our early expectations. Linear regression
                 performs slightly better than the random forest here, with about
                 <strong>15.37 MAE</strong> and <strong>R² = 0.21</strong>. That means the model captures
-                some scoring structure but leaves a great deal unexplained.
+                some scoring structure but leaves a great deal unexplained. With only six features and
+                substantial irreducible noise in NBA game totals, the random forest’s extra flexibility
+                likely translates into mild overfitting, while linear regression’s simpler form
+                generalizes slightly better. It is a useful reminder that “more flexible” does not
+                automatically mean “more accurate.”
               </p>
             </div>
           </div>
