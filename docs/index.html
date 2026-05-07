@@ -358,9 +358,23 @@ t_stat, p_val = ttest_ind(home_pts, away_pts, alternative='greater')
 print(home_pts.mean(), away_pts.mean(), p_val)</code></pre>
               <p>
                 The result is decisive: home teams average <strong>104.62</strong> points versus
-                <strong>100.99</strong> for away teams, and the p-value is effectively zero. But the
-                plot tells a richer story than the test alone: the home edge declines over time, which
-                means “home-court advantage” is real but historically unstable.
+                <strong>100.99</strong> for away teams, with a gap of about <strong>3.63 points per
+                game</strong>. The t-statistic is extremely large and the p-value is effectively zero,
+                so we reject the null hypothesis that home and away scoring means are equal in favor of
+                the directional alternative that home teams score more.
+              </p>
+              <p>
+                The figure lets us go one step further than the test. It shows that the home advantage
+                is not just present on average; it also changes historically. Home win rate falls from
+                roughly <strong>68.3%</strong> in 1947–69 to about <strong>57.5%</strong> in 2010–22.
+                So our first conclusion is not simply “home teams win more.” It is that home-court
+                advantage is a real and statistically supported signal, but one that has weakened over
+                time and therefore should be treated as era-sensitive rather than fixed.
+              </p>
+              <p>
+                This directly motivates the first machine-learning task. If home advantage is real but
+                imperfect, then predicting home wins is a meaningful classification problem rather than
+                a trivial rule.
               </p>
             </div>
             <figure class="figure-card">
@@ -382,9 +396,24 @@ r, p = pearsonr(modern['season_year'], modern['avg_total_pts'])
 print(f'Pearson r = {r:.4f}, p = {p:.4e}')</code></pre>
               <p>
                 This produced one of the most interesting surprises in the project. Visually, scoring
-                absolutely changes across eras. But the simple post-1980 linear relationship is weak
-                and not statistically significant in the rerun. That forced us to refine our
-                interpretation: the right story is about era shifts, not one monotonic trend.
+                absolutely changes across eras. But the simple post-1980 linear relationship is weak:
+                <strong>r = -0.122</strong> with <strong>p = 0.4358</strong>. Because that p-value is
+                far above 0.05, we should <strong>fail to reject the null hypothesis</strong> for this
+                specific Pearson test.
+              </p>
+              <p>
+                That does not mean the scoring story disappears. It means the story is not well
+                captured by one straight-line relationship over the whole modern era. The plot shows
+                visible historical phases: very high scoring in the early decades, a slower and more
+                defensive environment in the late 1990s and early 2000s, and then a renewed scoring
+                rise in the pace-and-space era after roughly 2015.
+              </p>
+              <p>
+                So the correct second conclusion is more nuanced: NBA scoring changed substantially,
+                but the change is <strong>nonlinear and era-based</strong>, not one statistically
+                significant linear post-1980 trend. That is exactly why season-year remains useful in
+                later models: not because the Pearson test proved a straight-line relationship, but
+                because year acts as a rough proxy for changing strategy, pace, and shot selection.
               </p>
             </div>
             <figure class="figure-card">
@@ -407,9 +436,25 @@ ps['high_rebounder'] = (ps['reb_pg'] &gt;= ps['reb_pg'].quantile(0.75)).astype(i
 ct = pd.crosstab(ps['high_scorer'], ps['high_rebounder'])
 chi2, p_chi, dof, expected = chi2_contingency(ct)</code></pre>
               <p>
-                The point is not just that the p-value is small. The more important result is that the
-                player-stat space is visibly organized. Points, rebounds, and turnovers do not vary
-                independently, which makes clustering a reasonable next step.
+                The point is not just that the p-value is small. In our actual setup, the test asks
+                whether being a <strong>high scorer</strong> and being a <strong>high rebounder</strong>
+                are independent events in the player-season data. The answer is no: the chi-square
+                result is strongly significant, so we reject independence.
+              </p>
+              <p>
+                The correlation heatmap and scatter plot help interpret that result. Points, rebounds,
+                and turnovers do not float around independently; they form recognizable statistical
+                patterns. Higher-usage offensive players tend to accumulate points and turnovers
+                together, while rebounds add another dimension of role identity. That means the
+                player-stat space is visibly structured rather than random.
+              </p>
+              <p>
+                The outlier analysis strengthens this conclusion. Elite scoring seasons sit far into
+                the right tail of the distribution, which suggests that the dataset contains genuine
+                star-level profiles rather than only mild variation around a league average. Together,
+                these findings justify using clustering later: if player-season features are dependent,
+                patterned, and occasionally extreme, then unsupervised role discovery is a reasonable
+                next step.
               </p>
             </div>
             <figure class="figure-card">
@@ -613,10 +658,10 @@ y_pred_rfr = rfr.predict(X_test_r)</code></pre>
             <article class="card">
               <h3>Main takeaways</h3>
               <ul class="clean-list">
-                <li>Home-court advantage is statistically significant but historically weaker than it used to be.</li>
-                <li>League scoring changes are better described as era shifts than as one smooth linear rise.</li>
-                <li>Player-season box scores contain meaningful role structure and real outliers.</li>
-                <li>Simple pre-game models improve on naive baselines, but they do not come close to perfect prediction.</li>
+                <li>Home-court advantage is statistically significant, but the size of that advantage declines across eras.</li>
+                <li>The post-1980 Pearson test does not support a single linear scoring trend, even though the visual history clearly shows major era-based changes.</li>
+                <li>Player-season box-score features are not independent and contain enough structure to motivate archetype discovery.</li>
+                <li>Simple pre-game models improve on naive baselines, but they remain modest rather than highly predictive.</li>
               </ul>
             </article>
             <article class="card">
@@ -632,7 +677,8 @@ y_pred_rfr = rfr.predict(X_test_r)</code></pre>
           <div class="card quote-card">
             <p>
               The strongest lesson from the project is that careful data curation and step-by-step exploration let us separate strong
-              historical structure from irreducible uncertainty, allowing us to build powerful predictive models.
+              historical structure from irreducible uncertainty. The result is not a perfect predictive system; it is a more honest,
+              better-supported explanation of what the NBA data can and cannot tell us.
             </p>
           </div>
         </section>

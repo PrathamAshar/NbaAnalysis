@@ -9430,6 +9430,8 @@ The two-sample t-test is highly significant (p ≪ 0.001). Home teams outscore t
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'p-value    : </span><span class="si">{</span><span class="n">p</span><span class="si">:</span><span class="s1">.4e</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
 <span class="k">if</span> <span class="n">p</span> <span class="o">&lt;</span> <span class="mf">0.05</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="s1">'</span><span class="se">\n</span><span class="s1">→ Reject H₀. Significant linear relationship between year and scoring pace.'</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">'</span><span class="se">\n</span><span class="s1">→ Fail to reject H₀ at α=0.05. The post-1980 data does not show a statistically significant linear relationship between season year and average total points.'</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -9524,7 +9526,8 @@ p-value    : 4.3582e-01
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <p><strong>Conclusion 2 Summary:</strong><br/>
-Pearson correlation is statistically significant (p ≪ 0.05). While scoring was highest in the 1960s "run-and-gun" era, it dipped in the defensive 1990s-2000s and has climbed steeply again since ~2015. The right panel shows three-point attempts rising almost exponentially — a structural shift in how the game is played. This trend means <strong>pace</strong> and <strong>3-point efficiency</strong> will likely be critical features in our later predictive models.</p>
+For the <strong>post-1980 Pearson correlation test</strong>, we <strong>fail to reject the null hypothesis</strong> at the 0.05 level (<code>p = 0.4358</code>). In other words, this specific test does <strong>not</strong> provide evidence of a statistically significant <strong>linear</strong> relationship between season year and average total points over the full modern period.</p>
+<p>That does <strong>not</strong> mean scoring stayed constant. The plot shows clear <strong>era-based changes</strong>: scoring was very high in the 1960s, dipped during the slower, more defensive 1990s-2000s, and rose sharply again in the pace-and-space era after roughly 2015. Our takeaway is therefore more nuanced: NBA scoring has changed substantially over time, but the change is <strong>nonlinear</strong> and better described by shifts in era, pace, and shot selection than by one straight-line trend. This motivates using <strong>season/era features</strong> and recent team scoring form in our later predictive models.</p>
 </div>
 </div>
 </div>
@@ -10270,13 +10273,8 @@ Scoring outliers (|z| &gt; 3): 108 player-seasons
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <p><strong>Conclusion 3 Summary:</strong><br/>
-The chi-square test strongly rejects independence (p ≪ 0.001). Players who score heavily are also more likely to be high-assist players — consistent with the "ball-dominant" archetype (guards and forwards who initiate offence).</p>
-<p>The heatmap reveals two clear archetypes:</p>
-<ol>
-<li><strong>Perimeter players</strong> — high pts, ast, stl, FG%, 3P%</li>
-<li><strong>Big men / centers</strong> — high reb, blk, negative correlation with 3P%</li>
-</ol>
-<p>Outlier detection (z &gt; 3) flags historically elite scoring seasons, which are true outliers rather than data errors. These structural correlations and the two archetypes will guide our feature engineering and model selection in Checkpoint 3.</p>
+The chi-square test strongly rejects independence (<code>p ≪ 0.001</code>). In our actual setup, this means being a <strong>high scorer</strong> and being a <strong>high rebounder</strong> are <strong>not independent</strong> events in the player-season data. Put differently, player box-score profiles have real internal structure rather than behaving like unrelated stat columns.</p>
+<p>The correlation heatmap and scatter plot reinforce that point. Points, rebounds, and turnovers move together in meaningful ways, which suggests that broad player roles can be recovered from simple box-score features alone. The outlier check also shows that elite scoring seasons are genuine statistical outliers rather than obvious data errors. Together, these results support the idea that a clustering method like K-Means is a reasonable next step for uncovering player archetypes.</p>
 </div>
 </div>
 </div>
@@ -10300,25 +10298,25 @@ The chi-square test strongly rejects independence (p ≪ 0.001). Players who sco
 <tbody>
 <tr>
 <td>1</td>
-<td>Home teams score more and win &gt; 55 % of games</td>
+<td>Home teams score more and win more often, but the advantage is shrinking by era</td>
 <td>Two-sample t-test</td>
-<td>p ≪ 0.001; confirmed — but advantage is declining</td>
+<td>Highly significant; home scoring and home win rate remain above away baselines</td>
 </tr>
 <tr>
 <td>2</td>
-<td>Scoring has trended upward, especially post-2015</td>
-<td>Pearson correlation</td>
-<td>Significant r; driven by pace + 3-point revolution</td>
+<td>NBA scoring changes substantially across eras, but not as one statistically significant linear post-1980 trend</td>
+<td>Pearson correlation + time-series plot</td>
+<td>Fail to reject the null for a simple post-1980 linear relationship; visual evidence supports nonlinear era effects</td>
 </tr>
 <tr>
 <td>3</td>
-<td>High scoring and high assists are not independent; clear stat archetypes exist</td>
-<td>Chi-square + correlation matrix</td>
-<td>χ² significant; two player archetypes identified</td>
+<td>Player-season box-score features are not independent and contain usable role structure</td>
+<td>Chi-square + correlation matrix + outlier check</td>
+<td>χ² significant; correlations and outliers support later clustering analysis</td>
 </tr>
 </tbody>
 </table>
-<p><strong>Next steps (Checkpoint 3):</strong> Use these findings to build predictive models — likely clustering (k-means) for player archetypes and logistic/linear regression for game-outcome prediction.</p>
+<p><strong>Why these three conclusions matter:</strong> Conclusion 1 motivates a <strong>classification</strong> problem around home wins, Conclusion 2 motivates including <strong>season/era and recent scoring features</strong> in predictive models, and Conclusion 3 motivates an <strong>unsupervised clustering</strong> analysis of player archetypes.</p>
 </div>
 </div>
 </div>
@@ -10330,7 +10328,8 @@ The chi-square test strongly rejects independence (p ≪ 0.001). Players who sco
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <hr/>
-<h2 id="5.-Primary-Analysis-%E2%80%94-Machine-Learning">5. Primary Analysis — Machine Learning<a class="anchor-link" href="#5.-Primary-Analysis-%E2%80%94-Machine-Learning">¶</a></h2><p>The exploratory analysis confirmed three structural patterns in the data: home teams really do win more often, scoring has risen dramatically in the modern era, and player statistics correlate in ways that suggest underlying archetypes. In this section we use machine learning to move from <em>describing</em> these patterns to <em>modeling</em> them.</p>
+<h2 id="5.-Primary-Analysis-%E2%80%94-Machine-Learning">5. Primary Analysis — Machine Learning<a class="anchor-link" href="#5.-Primary-Analysis-%E2%80%94-Machine-Learning">¶</a></h2><p>The exploratory analysis gave us three concrete modeling directions. First, home teams really do have an advantage, so predicting <strong>home wins</strong> is a meaningful classification task. Second, the scoring environment clearly changes across eras, even though a simple post-1980 linear correlation is not statistically significant; that means we should treat <strong>season/year as an era-sensitive feature</strong>, not as proof of a single monotonic trend. Third, player box-score features are statistically related, which makes <strong>clustering</strong> a natural tool for discovering broad archetypes.</p>
+<p>In this section we use machine learning to move from <em>describing</em> these patterns to <em>modeling</em> them.</p>
 <p>We apply three complementary techniques:</p>
 <table>
 <thead>
@@ -11228,34 +11227,34 @@ The chi-square test strongly rejects independence (p ≪ 0.001). Players who sco
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <hr/>
 <h2 id="7.-Insights-and-Conclusions">7. Insights and Conclusions<a class="anchor-link" href="#7.-Insights-and-Conclusions">¶</a></h2><h3 id="What-the-analysis-showed">What the analysis showed<a class="anchor-link" href="#What-the-analysis-showed">¶</a></h3><p>We started this tutorial with three questions, and the data + models gave us three answers:</p>
-<p><strong>1. Predicting home wins is meaningful but capped.</strong> Our random forest reached a test-set ROC-AUC of roughly 0.66–0.70 using only six pre-tip-off features. That's clearly better than chance (0.50) and better than the naive "always pick home" baseline. But the gap between our model and a perfect classifier is large — meaning much of the variation in NBA outcomes really is irreducible noise, injuries, refereeing, fatigue, and game-day specifics that the box-score-derived features can't see. The logistic regression coefficients confirm an EDA finding: home-court advantage is weakening over time. The negative coefficient on <code>season_year</code> is small but consistent, and matches the visible decline in home win rate from ~64% in the 1970s to ~55% in recent years.</p>
-<p><strong>2. Player archetypes are real and discoverable from box-score data alone.</strong> K-Means with <code>k=4</code> (selected by silhouette analysis) produces clusters that map onto basketball common sense: stars, wings, role players, and bench. The fact that the silhouette score is positive and the clusters separate visibly in PCA space tells us the 3-dimensional feature space (points, rebounds, turnovers per game) genuinely contains role information, not just noise. The PCA projection captures the bulk of the variance in two dimensions, meaning a simple 2D scatter is a faithful summary of the higher-dimensional structure.</p>
-<p><strong>3. The era effect dominates total-points prediction.</strong> Of our six features, season-year and recent team scoring pace are the most important — together accounting for the majority of the random-forest's predictive signal. The MAE of ~9–11 points means typical predictions are within about 5% of the actual game total. The model captures the long-term scoring rise but slightly under-predicts the most extreme high-scoring seasons, which is the expected "regression to the mean" behavior of an ensemble model that hasn't seen the most recent extremes during training.</p>
+<p><strong>1. Predicting home wins is meaningful but capped.</strong> Our supervised models perform better than the naive "always pick the home team" baseline, which means recent team form and home-court context do contain real predictive signal. At the same time, the held-out performance is still far from perfect, reminding us that NBA outcomes depend on many game-specific factors that are not captured by a small pre-tip-off feature set.</p>
+<p><strong>2. The scoring story is about eras, not one simple straight-line trend.</strong> The visual history of NBA scoring clearly shows major changes in style and pace across decades. However, our post-1980 Pearson correlation test does <strong>not</strong> find a statistically significant linear relationship between season year and average total points, so we should <strong>fail to reject the null hypothesis</strong> for that specific test. The right interpretation is therefore that scoring changes are real, but they are better understood as nonlinear era shifts than as one continuous linear rise.</p>
+<p><strong>3. Player box-score features contain genuine structural information.</strong> Our chi-square test and correlation analysis show that high scoring and high rebounding are not independent in the player-season data. Combined with the outlier analysis, this suggests that even a small set of box-score features contains enough structure to support meaningful clustering and role discovery.</p>
 <h3 id="Limitations-and-caveats">Limitations and caveats<a class="anchor-link" href="#Limitations-and-caveats">¶</a></h3><ul>
-<li><strong>Feature parsimony.</strong> We deliberately used a small feature set (6 game-level features for prediction; 3 player-level features for clustering). With richer features — assists, steals, blocks, three-point attempts, shooting efficiency, rest days, injuries — we expect substantially better classification AUC and more interpretable clusters. We chose simplicity to keep this tutorial readable; a real production model would lean harder on feature engineering.</li>
-<li><strong>Time-aware split is one choice among many.</strong> We split before/after 2017. A different cutoff would yield slightly different numbers. The right split depends on what question you're asking; for a tutorial, our cutoff illustrates the principle (don't peek at the future).</li>
-<li><strong>No causal claims.</strong> We described correlations and predictive power. We did not, for example, measure whether coaching strategy <em>causes</em> the era effect on scoring — only that something correlated with year does.</li>
-<li><strong>Pre-1980 coverage is uneven.</strong> The play-by-play table is much denser from 1996 onwards, so player-season aggregates from earlier eras are based on fewer events and have wider error bars than they appear.</li>
+<li><strong>Feature parsimony.</strong> We deliberately used a small feature set (6 game-level features for prediction; 3 player-level features for clustering). With richer features — assists, steals, blocks, three-point attempts, shooting efficiency, rest days, injuries — we expect substantially better classification accuracy and more interpretable clusters.</li>
+<li><strong>Linear tests can miss nonlinear history.</strong> Conclusion 2 is a good example: a simple Pearson correlation across the full post-1980 era misses real changes that are obvious when the data is plotted over time.</li>
+<li><strong>No causal claims.</strong> We described correlations and predictive power. We did not, for example, show that a rule change <em>causes</em> scoring to rise — only that scoring patterns differ across eras.</li>
+<li><strong>Pre-1980 and event-level coverage are imperfect.</strong> Historical sports data is not equally dense across every decade, so some player-level aggregates are more reliable in modern seasons than in very early ones.</li>
 </ul>
 <h3 id="What-an-informed-reader-could-explore-next">What an informed reader could explore next<a class="anchor-link" href="#What-an-informed-reader-could-explore-next">¶</a></h3><p>For a reader who wants to push further, the same dataset supports many extensions:</p>
 <ul>
 <li><strong>Sequence models on play-by-play.</strong> Each game is a sequence of events; recurrent or transformer models could predict the <em>next</em> event or the running game outcome from any midpoint.</li>
-<li><strong>Network analysis.</strong> The <code>play_by_play</code> table records who passed to whom (via assists). A graph constructed from these edges, per-team or per-season, would reveal "ball movement networks" that correlate with offensive efficiency.</li>
-<li><strong>Better game-outcome models.</strong> Adding rest days (computable from <code>game_date</code>), travel distance (with team city lookups), and current roster composition would likely push AUC over 0.70.</li>
-<li><strong>Salary efficiency.</strong> Joining the player stats to a salary table (available separately from <a href="https://www.basketball-reference.com">Basketball Reference</a>) would let you ask: which players outperform their pay?</li>
+<li><strong>Richer game-outcome models.</strong> Adding rest days, travel distance, roster availability, and betting lines would likely improve predictive performance beyond the simple baseline models used here.</li>
+<li><strong>Broader player archetypes.</strong> Adding assists, steals, blocks, and shooting splits would likely produce more nuanced clusters than points, rebounds, and turnovers alone.</li>
+<li><strong>Salary or value analysis.</strong> Joining the player data to salary information would let us study which archetypes or players generate the most value relative to cost.</li>
 </ul>
 <h3 id="Final-reflection">Final reflection<a class="anchor-link" href="#Final-reflection">¶</a></h3><p>Three things stood out to us during the project:</p>
 <ol>
-<li><strong>The data preprocessing is most of the work.</strong> The <code>play_by_play</code> table alone has ~13 million rows; getting from there to a clean player-game DataFrame required careful event filtering, type coercion, and aggregation. By contrast, fitting the models took comparatively little code.</li>
-<li><strong>Domain knowledge sharpens analysis.</strong> Knowing <em>why</em> 1980 matters (three-point line) and why 2015 matters (pace-and-space revolution) let us frame the right questions. Pure feature-search would have eventually surfaced the same patterns, but the path is much faster with context.</li>
-<li><strong>Visualizations earn their place when they answer a question.</strong> Every plot in this tutorial corresponds to a specific claim — "scoring went up," "home advantage shrank," "archetypes separate in 2D." That discipline kept the visual count down and the signal-to-noise ratio up.</li>
+<li><strong>Data preprocessing is most of the work.</strong> The hardest part was not fitting the models; it was turning raw tables and event logs into clean analysis-ready units.</li>
+<li><strong>Plots and tests need to be read together.</strong> Conclusion 2 would have been easy to overstate if we looked only at the figure or only at the p-value. Using both gave a more honest interpretation.</li>
+<li><strong>Simple models are still useful.</strong> Even when predictive performance is modest, the models help us understand which signals matter and which questions need richer features.</li>
 </ol>
-<p>We hope a reader who knew nothing about basketball walks away with a sense of how the modern NBA differs from earlier eras, and that a reader who knew the sport well now has a clearer picture of which patterns are large enough to model and which are dominated by noise.</p>
+<p>We hope a reader who knew little about basketball now understands how the modern NBA differs from earlier eras, and that a reader who already followed the sport now has a more data-driven view of which patterns are large, stable, and worth modeling.</p>
 <h3 id="Resources-for-further-learning">Resources for further learning<a class="anchor-link" href="#Resources-for-further-learning">¶</a></h3><ul>
 <li><a href="https://scikit-learn.org/stable/user_guide.html">scikit-learn user guide</a> — the canonical reference for the ML methods we used.</li>
 <li><a href="https://www.basketball-reference.com">Basketball Reference</a> — alternative NBA stats source, often with cleaner historical coverage.</li>
 <li><a href="https://hastie.su.domains/ElemStatLearn/">Hastie, Tibshirani, Friedman — <em>The Elements of Statistical Learning</em></a> — free PDF; deeper theory behind classification, clustering, and regression.</li>
-<li><a href="https://christophm.github.io/interpretable-ml-book/">Christoph Molnar — <em>Interpretable Machine Learning</em></a> — free; covers feature importance, SHAP values, and the interpretability methods we leaned on.</li>
+<li><a href="https://christophm.github.io/interpretable-ml-book/">Christoph Molnar — <em>Interpretable Machine Learning</em></a> — free; covers feature importance and interpretability methods relevant to this tutorial.</li>
 </ul>
 </div>
 </div>
